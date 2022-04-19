@@ -3,5 +3,9 @@
 {% block title %}Записи сообщества {{ group }}{% endblock %}
 
 {% block content %}
-  {% include 'includes/create-one-post.html' %}
+  <div class="container py-5">
+    {% for post in posts %}
+      {% include 'includes/create-one-post.html' %}
+    {% endfor %}
+  </div>
 {% endblock %}

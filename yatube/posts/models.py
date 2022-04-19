@@ -1,5 +1,7 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+
+from yatube.settings import TEXT_MAX_LENGTH_ADMIN
 
 User = get_user_model()
 
@@ -18,18 +20,20 @@ class Post(models.Model):
     )
     group = models.ForeignKey(
         'Group',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        related_name='posts',
         verbose_name='Группа',
     )
+
+    def __str__(self):
+        return self.text[:TEXT_MAX_LENGTH_ADMIN]
 
     class Meta:
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
         ordering = ['-pub_date']
-        # не смог найти команду, которая ограничит
-        # по символам поле text в админке
 
 
 class Group(models.Model):

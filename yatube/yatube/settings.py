@@ -120,3 +120,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+POSTS_FOR_ONE_PAGE = 10
+
+TEXT_MAX_LENGTH_ADMIN = 100

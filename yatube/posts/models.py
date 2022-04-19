@@ -1,7 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
-
-from yatube.settings import TEXT_MAX_LENGTH_ADMIN
 
 User = get_user_model()
 
@@ -28,7 +27,7 @@ class Post(models.Model):
     )
 
     def __str__(self):
-        return self.text[:TEXT_MAX_LENGTH_ADMIN]
+        return self.text[:settings.TEXT_MAX_LENGTH_ADMIN]
 
     class Meta:
         verbose_name = 'Пост'

@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 
 from .models import Group, Post
@@ -6,14 +8,19 @@ from .models import Group, Post
 
 def index(request):
     template = 'posts/index.html'
-    posts = Post.objects.all()[:settings.POSTS_FOR_ONE_PAGE]
+    post_list = Post.objects.all()
+    paginator = Paginator(post_list, settings.POSTS_FOR_ONE_PAGE)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'posts': posts,
-        'button': True
+        'page_obj': page_obj,
+        'button': True,
     }
     return render(request, template, context=context)
 
 
+@login_required
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)

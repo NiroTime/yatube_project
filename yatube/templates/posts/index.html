@@ -4,8 +4,9 @@
 
 {% block content %}
   <div class="container py-5">
-    {% for post in posts %}
+    {% for post in page_obj %}
       {% include 'includes/create-one-post.html' %}
     {% endfor %}
+    {% include 'includes/paginator.html' %}
   </div>
 {% endblock %}

@@ -18,16 +18,12 @@
   </head>
   <body>
     <main>
-      {% block header %}
-        {% include 'includes/header.html' %}
-      {% endblock %}
+      {% include 'includes/header.html' %}
 
       {% block content %}
       {% endblock %}
 
-      {% block footer %}
-        {% include 'includes/footer.html' %}
-      {% endblock %}
+      {% include 'includes/footer.html' %}
     </main>
   </body>
 </html>

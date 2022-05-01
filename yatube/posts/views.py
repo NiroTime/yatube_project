@@ -72,7 +72,30 @@ def post_create(request):
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
-            return redirect('posts:index')
+            return redirect('posts:profile', request.user.username)
     else:
         form = AddPostForm()
-    return render(request, 'posts/create_post.html', {'form': form})
+    return render(
+        request, 'posts/create_post.html',
+        {'form': form, 'title': 'Добавить запись'}
+    )
+
+
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'GET':
+        if request.user != post.author:
+            return redirect('posts:post_detail', post_id)
+        form = AddPostForm(instance=post)
+
+    if request.method == 'POST':
+        form = AddPostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return redirect('posts:profile', request.user.username)
+    context = {
+        'form': form,
+        'title': 'Редактировать запись',
+        'is_edit': True,
+    }
+    return render(request, 'posts/create_post.html', context=context)

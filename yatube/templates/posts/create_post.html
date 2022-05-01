@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Создать пост{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="container py-5">
   <div class="row justify-content-center">
@@ -15,7 +15,7 @@
               {% for field in form %}
                 {% for error in field.errors %}
                   <div class="alert alert-danger">
-                    {{ error|escape }} {{ field }}
+                    {{ error|escape }}
                   </div>
                 {% endfor %}
               {% endfor %}
@@ -50,7 +50,11 @@
             </div>
             <div class="d-flex justify-content-end">
               <button type="submit" class="btn btn-primary">
-                Добавить
+                {% if is_edit %}
+                  Сохранить
+                {% else %}
+                  Добавить
+                {% endif %}
               </button>
             </div>
           </form>

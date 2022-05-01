@@ -1,8 +1,7 @@
 from django.contrib.auth.views import *
 from django.urls import path
 
-from . import views
-
+from .views import SignUp
 
 app_name = 'users'
 
@@ -12,7 +11,7 @@ urlpatterns = [
       LogoutView.as_view(template_name='users/logged_out.html'),
       name='logout'
     ),
-    path('signup/', views.SignUp.as_view(), name='signup'),
+    path('signup/', SignUp.as_view(), name='signup'),
     path(
         'login/',
         LoginView.as_view(template_name='users/login.html'),

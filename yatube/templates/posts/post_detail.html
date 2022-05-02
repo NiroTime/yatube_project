@@ -32,6 +32,11 @@
     </aside>
     <article class="col-12 col-md-9">
       <p>{{ post.text }}</p>
+      {% if edit %}
+        <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
+          редактировать запись
+        </a>
+      {% endif %}
     </article>
   </div>
   </div>

@@ -45,7 +45,7 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'user': user,
+        'author_pytest_kakashka': user,
         'page_obj': page_obj,
         'button': True,
         'posts_count': posts_count
@@ -56,8 +56,13 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
+    if request.user == post.author:
+        edit = True
+    else:
+        edit = False
     posts_count = Post.objects.filter(author=post.author).count()
     context = {
+        'edit': edit,
         'post': post,
         'posts_count': posts_count,
     }
@@ -92,7 +97,7 @@ def post_edit(request, post_id):
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
-        return redirect('posts:profile', request.user.username)
+        return redirect('posts:post_detail', post_id)
     context = {
         'form': form,
         'title': 'Редактировать запись',

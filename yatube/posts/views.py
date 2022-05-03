@@ -20,7 +20,7 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    post_list = group.posts.all()
+    post_list = group.posts.select_related('group').all()
     page_obj = paginagor(request, post_list)
     context = {
         'group': group,

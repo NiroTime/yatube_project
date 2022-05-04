@@ -47,13 +47,9 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, pk=post_id)
-    if request.user == post.author:
-        owner = True
-    else:
-        owner = False
     posts_count = Post.objects.filter(author=post.author).count()
     context = {
-        'owner': owner,
+        'owner': request.user == post.author,
         'post': post,
         'posts_count': posts_count,
     }
@@ -70,9 +66,7 @@ def post_create(request):
             new_post.save()
             return redirect('posts:profile', request.user.username)
     return render(
-        request, 'posts/create_post.html',
-        {'form': form, 'title': 'Добавить запись'}
-    )
+        request, 'posts/create_post.html', {'form': form})
 
 
 @login_required
@@ -87,7 +81,6 @@ def post_edit(request, post_id):
         return redirect('posts:post_detail', post_id)
     context = {
         'form': form,
-        'title': 'Редактировать запись',
         'is_edit': True,
     }
     return render(request, 'posts/create_post.html', context=context)

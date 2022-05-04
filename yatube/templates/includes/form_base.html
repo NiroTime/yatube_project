@@ -1,5 +1,13 @@
 {% load user_filters %}
 {% csrf_token %}
+{# не понимаю как это non_field_errors но в теории нужно было это поле #}
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+  <div class="alert alert-danger">
+    {{ error|escape }}
+  </div>
+{% endfor %}
+{% endif %}
 {% for field in form %}
   <div class="form-group row my-3 p-3"
     {% if field.field.required %}
@@ -14,7 +22,17 @@
         <span class="required text-danger" >*</span>
       {% endif %}
     </label>
+{#  не понял как в атрибутах field раскопать переменную отвечающиую за #}
+{#  попробовал class:'form-control' in field.widgets не  #}
+{#  в итоге удалил из формы класс #}
     {{ field|addclass:'form-control' }}
+    {% if field.errors %}
+      {% for error in field.errors %}
+        <div class="alert alert-danger">
+          {{ error|escape }}
+        </div>
+      {% endfor %}
+    {% endif %}
     {% if field.help_text %}
       <small
         id="{{ field.id_for_label }}-help"
@@ -22,7 +40,6 @@
        {{ field.help_text }}
       </small>
     {% endif %}
-    <div class="form-error">{{ field.errors }}</div>
   </div>
 {% endfor %}
 

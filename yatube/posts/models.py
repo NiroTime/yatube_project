@@ -27,7 +27,7 @@ class Post(models.Model):
     )
 
     def __str__(self):
-        return self.text[:settings.TEXT_MAX_LENGTH_ADMIN]
+        return self.text[:settings.TEXT_MAX_LENGTH]
 
     class Meta:
         verbose_name = 'Пост'

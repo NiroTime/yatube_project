@@ -25,7 +25,12 @@ SECRET_KEY = 'hmqo(_51ikkd-+2ea$iv$po#a*1nlu1a@(j(sv*9mtyxl_=7u!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
+    'testserver',
+]
 
 
 # Application definition
@@ -127,7 +132,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 POSTS_FOR_ONE_PAGE = 10
 
-TEXT_MAX_LENGTH_ADMIN = 100
+TEXT_MAX_LENGTH = 15
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'

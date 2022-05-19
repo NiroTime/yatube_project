@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -23,52 +25,55 @@ class PostCreateFormTests(TestCase):
         self.user = User.objects.create_user(username='NoName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-
-    def test_post(self):
-        count_posts = Post.objects.count()
-        form_data = {
+        self.form_data = {
             'text': 'Данные из формы',
             'group': self.group.id
         }
+
+    def test_authorized_user_can_create_post(self):
         response = self.authorized_client.post(
             reverse('posts:post_create'),
-            data=form_data,
+            data=self.form_data,
             follow=True,
         )
-        post_1 = Post.objects.get(id=self.group.id)
-        author_1 = User.objects.get(username='NoName')
-        group_1 = Group.objects.get(title='Заголовок для тестовой группы')
-        self.assertEqual(Post.objects.count(), count_posts + 1)
+        post_1 = Post.objects.get(id=1)
+        self.assertEqual(Post.objects.count(), 1)
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': 'NoName'})
         )
         self.assertEqual(post_1.text, 'Данные из формы')
-        self.assertEqual(author_1.username, 'NoName')
-        self.assertEqual(group_1.title, 'Заголовок для тестовой группы')
+        self.assertEqual(post_1.author.username, 'NoName')
+        self.assertEqual(post_1.group.title, 'Заголовок для тестовой группы')
 
-    def test_authorized_edit_post(self):
-        # авторизованный может редактировать
-        form_data = {
-            'text': 'Данные из формы',
-            'group': self.group.id
-        }
-        self.authorized_client.post(
+    def test_guest_user_cant_create_post(self):
+        response = self.guest_client.post(
             reverse('posts:post_create'),
-            data=form_data,
+            data=self.form_data,
             follow=True,
         )
-        post_2 = Post.objects.get(id=self.group.id)
-        self.client.get(f'/NoName/{post_2.id}/edit/')
+        url = urljoin(reverse('login'), "?next=/create/")
+        self.assertRedirects(response, url)
+
+    def test_authorized_user_can_edit_post(self):
+        self.authorized_client.post(
+            reverse('posts:post_create'),
+            data=self.form_data,
+            follow=True,
+        )
+        post_1 = Post.objects.get(id=1)
+        self.client.get(reverse(
+            'posts:post_edit', kwargs={'post_id': post_1.pk})
+        )
         form_data = {
             'text': 'Измененный текст',
             'group': self.group.id
         }
         response_edit = self.authorized_client.post(
             reverse('posts:post_edit',
-                    kwargs={'post_id': post_2.id}),
+                    kwargs={'post_id': post_1.id}),
             data=form_data,
             follow=True,
         )
-        post_2 = Post.objects.get(id=self.group.id)
+        modified_post = Post.objects.get(id=1)
         self.assertEqual(response_edit.status_code, 200)
-        self.assertEqual(post_2.text, 'Измененный текст')
+        self.assertEqual(modified_post.text, 'Измененный текст')

@@ -6,7 +6,10 @@ User = get_user_model()
 
 
 class Post(models.Model):
-    text = models.TextField(verbose_name='Текст поста')
+    text = models.TextField(
+        verbose_name='Текст поста',
+        help_text='Текст нового поста'
+    )
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации'
@@ -24,6 +27,7 @@ class Post(models.Model):
         null=True,
         related_name='posts',
         verbose_name='Группа',
+        help_text='Группа, к которой будет относиться пост'
     )
 
     def __str__(self):

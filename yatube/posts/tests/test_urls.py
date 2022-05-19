@@ -15,22 +15,25 @@ class TaskURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.post = Post.objects.create(
-            author=User.objects.create_user(username='NoName'),
-            text='Тестовая запись для создания нового поста',
-        )
+        cls.user_owner = User.objects.create_user(username='NoName')
+
+        cls.user_new = User.objects.create_user(username='NewName')
 
         cls.group = Group.objects.create(
             title='Заголовок для тестовой группы',
             slug='test_slug'
         )
 
+        cls.post = Post.objects.create(
+            author=cls.user_owner,
+            text='Тестовая запись для создания нового поста',
+            group=cls.group,
+        )
+
     def setUp(self):
         self.guest_client = Client()
-        self.user_owner = TaskURLTests.post.author
         self.authorized_client_owner = Client()
         self.authorized_client_owner.force_login(self.user_owner)
-        self.user_new = User.objects.create_user(username='NewName')
         self.authorized_client_new = Client()
         self.authorized_client_new.force_login(self.user_new)
 

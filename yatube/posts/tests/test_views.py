@@ -4,8 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Group, Post
-
+from ..models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -162,3 +161,50 @@ class PaginatorViewsTest(TestCase):
             self.assertEqual(
                 len(response.context.get('page_obj').object_list), 1
             )
+
+
+class FollowTests(TestCase):
+    def setUp(self):
+        self.user_follower = Client()
+        self.author_following = Client()
+        self.user_1 = User.objects.create_user(username='follower')
+        self.author_1 = User.objects.create_user(username='following')
+        self.post = Post.objects.create(
+            author=self.author_1,
+            text='Тестовая запись для тестирования ленты'
+        )
+        self.user_follower.force_login(self.user_1)
+        self.author_following.force_login(self.author_1)
+
+    def test_user_can_follow_author(self):
+        self.user_follower.get(
+            reverse('posts:profile_follow', args=(self.author_1.username,)))
+        self.assertEqual(Follow.objects.all().count(), 1)
+
+    def test_user_can_unfollow_author(self):
+        self.user_follower.get(
+            reverse('posts:profile_follow', kwargs={
+                'username': self.author_1.username
+            }))
+        self.user_follower.get(
+            reverse('posts:profile_unfollow', kwargs={
+                'username': self.author_1.username
+            }))
+        self.assertEqual(Follow.objects.all().count(), 0)
+
+    def test_following_authors_posts_appends_on_follow_page(self):
+        """запись появляется в ленте подписчиков"""
+        Follow.objects.create(user=self.user_1,
+                              author=self.author_1)
+        response = self.user_follower.get('/follow/')
+        post_text = response.context["page_obj"][0].text
+        self.assertEqual(post_text, self.post.text)
+
+    def test_authorized_client_can_add_comment(self):
+        self.author_following.post(
+            f'/posts/{self.post.id}/', {
+                'text': "тестовый комментарий"
+            }, follow=True
+        )
+        response = self.author_following.get(f'/posts/{self.post.id}/')
+        self.assertContains(response, 'тестовый комментарий')

@@ -1,6 +1,9 @@
+import tempfile
 from urllib.parse import urljoin
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -14,6 +17,7 @@ class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.group = Group.objects.create(
             title='Заголовок для тестовой группы',
             slug='test_slug5',
@@ -77,3 +81,30 @@ class PostCreateFormTests(TestCase):
         modified_post = Post.objects.get(id=1)
         self.assertEqual(response_edit.status_code, 200)
         self.assertEqual(modified_post.text, 'Измененный текст')
+
+    def test_user_can_upload_post_with_picture(self):
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
+        form_data = {
+            'text': 'Пост с картинкой',
+            'group': self.group.id,
+            'image': uploaded
+        }
+        response = self.authorized_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True,
+        )
+        post = Post.objects.first()
+        self.assertIsNotNone(post.post_image)

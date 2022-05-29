@@ -8,6 +8,13 @@
       </a>
       <ul class="nav nav-pills">
         {% with request.resolver_match.view_name as view_name %}
+        {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name  == 'posts:follow_index' %}
+            active
+            {% endif %}" href="{% url 'posts:follow_index' %}">Лента подписок</a>
+          </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.view_name  == 'about:author' %}
           active

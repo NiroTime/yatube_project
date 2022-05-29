@@ -18,8 +18,8 @@ class PostTests(TestCase):
         cls.user = User.objects.create_user(username='test_name')
 
         cls.group = Group.objects.create(
-                title='Заголовок для тестовой группы',
-                slug='test_slug'
+            title='Заголовок для тестовой груп пы',
+            slug='test_slug'
         )
 
         cls.post = Post.objects.create(

@@ -5,6 +5,20 @@
 {% block content %}
   <div class="container py-5">
     <h1>Все посты пользователя {{ author.username }} </h1>
+    {% if user != author %}
+      {% if following %}
+        <a href="{% url 'posts:profile_unfollow' author.username %}">
+          <div class="btn btn-sm btn-primary">Отписаться</div>
+        </a>
+      {% else %}
+        <a href="{% url 'posts:profile_follow' author.username %}">
+          <div class="btn btn-sm btn-primary">Подписаться</div>
+        </a>
+      {% endif %}
+    {% endif %}
+    {% if author.profile.avatar %}
+      <p><img width="300px" height="350px" src="{{ author.profile.avatar.url }}"></p>
+    {% endif %}
     <h3>Всего постов: {{ post_count }} </h3>
     {% for post in page_obj %}
       {% include 'includes/create-one-post.html' %}

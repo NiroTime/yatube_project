@@ -3,18 +3,29 @@
     <li>
       Автор: {{ post.author.get_full_name }}
       {% if request.resolver_match.view_name  != 'posts:profile' %}
-      <a href="{% url 'posts:profile' post.author %}">все посты пользователя</a>
+      <a class="btn btn-sm btn-primary" href="{% url 'posts:profile' post.author %}">все посты пользователя</a>
       {% endif %}
     </li>
     <li>
       Дата публикации: {{ post.pub_date|date:"d E Y" }}
     </li>
+    {% if post.post_image %}
+      <img width="300px" height="350px" src="{{ post.post_image.url }}">
+    {% endif %}
   </ul>
   <p>{{ post.text }}</p>
-  <a href="{% url 'posts:post_detail' post.pk %}">подробная информация</a>
-</article>
+  <a class="btn btn-sm btn-primary" href="{% url 'posts:post_detail' post.pk %}">подробная информация</a>
+  {% if post.comments.exists %}
+    <div>
+      Комментариев: {{ post.comments.count }}
+    </div>
+    <div>
+      {{ post.comments.first }}
+    </div>
+  {% endif %}
   {% if post.group and button %}
-  <a href="{% url 'posts:group_list' post.group.slug %}"
+  <a class="btn btn-sm btn-primary" href="{% url 'posts:group_list' post.group.slug %}"
   >все записи группы</a>
   {% endif %}
   {% if not forloop.last %}<hr>{% endif %}
+</article>

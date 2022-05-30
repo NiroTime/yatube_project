@@ -16,7 +16,7 @@ class Post(models.Model):
         auto_now_add=True,
         verbose_name='Дата публикации'
     )
-    post_image = ImageField(upload_to="photos/%Y/%m/%d/", blank=True)
+    image = ImageField(upload_to="photos/%Y/%m/%d/", blank=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -11,7 +11,7 @@ class PostAdmin(admin.ModelAdmin):
         'pub_date',
         'author',
         'group',
-        'post_image',
+        'image',
     )
     list_editable = ('group',)
     search_fields = ('text',)

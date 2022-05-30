@@ -5,6 +5,9 @@ __pycache__/
 media/
 .media
 .media/
+yatube_chace/
+.yatube_chace
+.yatube_chace/
 
 # C extensions
 *.so

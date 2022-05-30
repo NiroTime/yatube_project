@@ -115,4 +115,3 @@ class PostCreateFormTests(TestCase):
         post = Post.objects.first()
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(post.image)
-

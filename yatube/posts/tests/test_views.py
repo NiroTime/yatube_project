@@ -44,7 +44,7 @@ class PostTests(TestCase):
             author=cls.user,
             text='Тестовая запись для создания поста',
             group=cls.group,
-            post_image=uploaded,
+            image=uploaded,
         )
 
     def setUp(self):
@@ -94,7 +94,7 @@ class PostTests(TestCase):
                 self.assertEqual(first_object.author, self.post.author)
                 self.assertEqual(post_group.title, self.post.group.title)
                 self.assertEqual(post_group.slug, self.post.group.slug)
-                self.assertEqual(first_object.post_image, self.post.post_image)
+                self.assertEqual(first_object.image, self.post.image)
 
     def test_post_detail_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом"""
@@ -103,7 +103,7 @@ class PostTests(TestCase):
         first_object = response.context["post"]
         self.assertEqual(first_object.text, self.post.text)
         self.assertEqual(first_object.author, self.post.author)
-        self.assertEqual(first_object.post_image, self.post.post_image)
+        self.assertEqual(first_object.image, self.post.image)
 
     def test_post_form_show_correct_context(self):
         """Шаблон post_create/post_edit сформирован
@@ -225,7 +225,7 @@ class FollowTests(TestCase):
 
     def test_authorized_client_can_add_comment(self):
         response = self.author_following.post(
-            f'/posts/{self.post.id}/', {
+            f'/posts/{self.post.id}/comment/', {
                 'text': "тестовый комментарий"
             }, follow=True
         )

@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -147,8 +149,12 @@ def profile_follow(request, username):
     user = request.user
     author = User.objects.get(username=username)
     is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
-        Follow.objects.create(user=user, author=author)
+    if not is_follower.exists():
+        try:
+            Follow.objects.create(user=user, author=author)
+        except Exception as err:
+            logger = logging.getLogger()
+            logger.error(err)
     return redirect('posts:profile', username)
 
 

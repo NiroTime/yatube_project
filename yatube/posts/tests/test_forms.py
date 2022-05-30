@@ -17,17 +17,13 @@ class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
         cls.group = Group.objects.create(
             title='Заголовок для тестовой группы',
             slug='test_slug5',
             description='Тестовое описание'
         )
-
-    @classmethod
-    def tearDownClass(cls):
-        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-        super().tearDownClass()
+        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
     def setUp(self):
         self.guest_client = Client()
@@ -38,6 +34,11 @@ class PostCreateFormTests(TestCase):
             'text': 'Данные из формы',
             'group': self.group.id
         }
+
+    @classmethod
+    def tearDownClass(cls):
+        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def test_authorized_user_can_create_post(self):
         response = self.authorized_client.post(
@@ -114,3 +115,4 @@ class PostCreateFormTests(TestCase):
         post = Post.objects.first()
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(post.image)
+

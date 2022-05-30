@@ -3,67 +3,72 @@
   <nav class="navbar navbar-light" style="background-color: lightskyblue">
     <div class="container">
       <a class="navbar-brand" href="{% url 'posts:index' %}">
-        <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="{% static 'img/logo.png' %}" width="30" height="30"
+             class="d-inline-block align-top" alt="">
         <span style="color:red">Ya</span>tube
       </a>
       <ul class="nav nav-pills">
         {% with request.resolver_match.view_name as view_name %}
-        {% if request.user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.view_name  == 'posts:follow_index' %}
+          {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.view_name  == 'posts:follow_index' %}
             active
-            {% endif %}" href="{% url 'posts:follow_index' %}">Лента подписок</a>
-          </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.view_name  == 'about:author' %}
+            {% endif %}" href="{% url 'posts:follow_index' %}">Лента
+                подписок</a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name  == 'about:author' %}
           active
           {% endif %}" href="{% url 'about:author' %}">Об авторе</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.view_name  == 'about:tech' %}
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.view_name  == 'about:tech' %}
           active
           {% endif %}" href="{% url 'about:tech' %}">Технологии</a>
-        </li>
-        {% if request.user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.view_name  == 'posts:post_create' %}
+          </li>
+          {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.view_name  == 'posts:post_create' %}
           active
           {% endif %}" href="{% url 'posts:post_create' %}">Новая запись</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:password_change' %}
+            </li>
+            <li class="nav-item">
+              <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:password_change' %}
           active
-          {% endif %}" href="{% url 'users:password_change' %}">Изменить пароль</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'posts:profile_edit' %}
+          {% endif %}" href="{% url 'users:password_change' %}">Изменить
+                пароль</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link link-light {% if request.resolver_match.view_name  == 'posts:profile_edit' %}
           active
-          {% endif %}" href="{% url 'posts:profile_edit' request.user.username %}">Изменить профиль</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:logout' %}
+          {% endif %}"
+                 href="{% url 'posts:profile_edit' request.user.username %}">Изменить
+                профиль</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:logout' %}
           active
           {% endif %}" href="{% url 'users:logout' %}">Выйти</a>
-        </li>
-        <li>
-          <a class="nav-link" href="{% url 'posts:profile' request.user.username %}">{{ user.username }}</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:login' %}
+            </li>
+            <li>
+              <a class="nav-link"
+                 href="{% url 'posts:profile' request.user.username %}">{{ user.username }}</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:login' %}
           active
           {% endif %}" href="{% url 'users:login' %}">Войти</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:signup' %}
+            </li>
+            <li class="nav-item">
+              <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:signup' %}
           active
           {% endif %}" href="{% url 'users:signup' %}">Регистрация</a>
-        </li>
-        {% endif %}
-      {% endwith %}
+            </li>
+          {% endif %}
+        {% endwith %}
       </ul>
-      {# Конец добавленого в спринте #}
     </div>
   </nav>
 </header>

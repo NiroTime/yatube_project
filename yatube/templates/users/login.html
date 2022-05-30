@@ -7,23 +7,16 @@
       <div class="card">
         <div class="card-header">Войти на сайт</div>
         <div class="card-body">
-          <form method="post"
-            {% if action_url %}
-              action="{% url action_url %}"
-            {% endif %}
-          >
+          <form method="post">
             {% include 'includes/form_base.html' %}
             <div class="col-md-6 offset-md-4">
               <button type="submit" class="btn btn-primary">
                 Войти
               </button>
-              <a href="{% url 'users:password_change' %}" class="btn btn-link">
-                Забыли пароль?
-              </a>
             </div>
           </form>
         </div>
       </div>
     </div>
-</div>
+  </div>
 {% endblock %}

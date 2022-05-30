@@ -47,16 +47,16 @@ class PostTests(TestCase):
             image=uploaded,
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
     def setUp(self):
         self.guest_client = Client()
         self.user = PostTests.post.author
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-
-    @classmethod
-    def tearDownClass(cls):
-        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-        super().tearDownClass()
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -258,3 +258,4 @@ class CacheTests(TestCase):
         cache.clear()
         third_step = self.authorized_client.get(reverse('posts:index'))
         self.assertNotEqual(first_step.content, third_step.content)
+        cache.clear()

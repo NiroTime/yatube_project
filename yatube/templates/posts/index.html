@@ -6,6 +6,7 @@
   <div class="container py-5">
     {% cache 20 index_page with page_obj %}
       {% for post in page_obj %}
+        {% include 'includes/switcher.html' %}
         {% include 'includes/create-one-post.html' %}
       {% endfor %}
     {% endcache %}

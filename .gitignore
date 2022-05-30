@@ -2,9 +2,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
+media/
+.media
+.media/
 
 # C extensions
 *.so
+.coverage
+.coverage.*
+coverage.xml
+*.cover
 
 # Distribution / packaging
 .Python

@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from users.models import ImageField
 
 User = get_user_model()
 
@@ -16,7 +15,7 @@ class Post(models.Model):
         auto_now_add=True,
         verbose_name='Дата публикации'
     )
-    image = ImageField(upload_to="photos/%Y/%m/%d/", blank=True)
+    image = models.ImageField(upload_to="photos/%Y/%m/%d/", blank=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

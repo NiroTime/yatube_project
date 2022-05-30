@@ -5,78 +5,86 @@
 
 {% block content %}
   <div class="container py-5">
-  <div class="row">
-    <aside class="col-12 col-md-3">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          Дата публикации: {{ post.pub_date|date:"d E Y" }}
-        </li>
-          {% if post.group %}
+    <div class="row">
+      <aside class="col-12 col-md-3">
+        <ul class="list-group list-group-flush">
           <li class="list-group-item">
-            Группа: {{ post.group }}
-            <a href="{% url 'posts:group_list' post.group.slug %}"
-              >все записи группы</a>
+            Дата публикации: {{ post.pub_date|date:"d E Y" }}
           </li>
+          {% if post.group %}
+            <li class="list-group-item">
+              Группа: {{ post.group }}
+              <a href="{% url 'posts:group_list' post.group.slug %}"
+              >все записи группы</a>
+            </li>
           {% endif %}
           <li class="list-group-item">
             Автор: {{ post.author.username }}
           </li>
           <li class="list-group-item">
             {% if post.author.profile.avatar %}
-              <img width="250px" height="250px" src="{{ post.author.profile.avatar.url }}">
+              <img width="250px" height="250px"
+                   src="{{ post.author.profile.avatar.url }}">
             {% endif %}
           </li>
           <li class="list-group-item d-flex justify-content-between align-items-center">
-          Всего постов автора:  <span >{{ posts_count }}</span>
+            Всего постов автора: <span>{{ posts_count }}</span>
           </li>
-        <li class="list-group-item">
-          <a href="{% url 'posts:profile' post.author.username %}">
-            все посты пользователя
+          <li class="list-group-item">
+            <a href="{% url 'posts:profile' post.author.username %}">
+              все посты пользователя
+            </a>
+          </li>
+        </ul>
+      </aside>
+      <article class="col-12 col-md-9">
+        {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+          <img src="{{ im.url }}">
+        {% endthumbnail %}
+        <p>{{ post.text|linebreaksbr }}</p>
+        {% if owner %}
+          <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
+            редактировать запись
           </a>
-        </li>
-      </ul>
-    </aside>
-    <article class="col-12 col-md-9">
-      {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
-        <img src="{{ im.url }}">
-      {% endthumbnail %}
-      <p>{{ post.text|linebreaksbr }}</p>
-      {% if owner %}
-        <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
-          редактировать запись
-        </a>
-      {% endif %}
-    </article>
+        {% endif %}
+      </article>
 
-  {% if user.is_authenticated %}
-    <div class="card my-4">
-      <form method="post">
-        {% csrf_token %}
-        <h5 class="card-header">Добавить комментарий:</h5>
-        <div class="card-body">
-          <div class="form-group">
-            {{ form.text|addclass:"form-control" }}
-          </div>
-          <button type="submit" class="btn btn-primary">Отправить</button>
+      {% if user.is_authenticated %}
+        <div class="card my-4">
+          <form method="post" action="{% url 'posts:add_comment' post.pk %}">
+            {% csrf_token %}
+            <h5 class="card-header">Добавить комментарий:</h5>
+            <div class="card-body">
+              <div class="form-group">
+                {{ form.text|addclass:"form-control" }}
+                {% if form.text.errors %}
+                  {% for error in form.text.errors %}
+                    <div class="alert alert-danger">
+                      {{ error|escape }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <button type="submit" class="btn btn-primary">Отправить</button>
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-  {% endif %}
+      {% endif %}
 
-  {% for item in comments %}
-    <div class="media card mb-4">
-      <div class="media-body card-body">
-        <h5 class="mt-0">
-          <a
-            href="{% url 'posts:profile' item.author.username %}"
-            name="comment_{{ item.id }}"
-          >{{ item.author.username }}</a>
-        </h5>
-        <p>{{ item.text|linebreaksbr }}</p>
-      </div>
-    </div>
-  {% endfor %}
+      {% for item in comments %}
+        <div class="media card mb-4">
+          <div class="media-body card-body">
+            <h5 class="mt-0">
+              <a
+                      href="{% url 'posts:profile' item.author.username %}"
+                      name="comment_{{ item.id }}"
+              >{{ item.author.username }}</a>
+            </h5>
+            <p>{{ item.text|linebreaksbr }}</p>
+          </div>
+        </div>
+      {% endfor %}
 
-  </div>
+    </div>
   </div>
 {% endblock %}

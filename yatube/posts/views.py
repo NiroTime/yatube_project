@@ -86,13 +86,24 @@ def post_detail(request, post_id):
         'form': form,
         'comments': comments,
     }
+    return render(request, template, context=context)
+
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    form = CommentForm(request.POST or None)
+    context = {
+        'form': form,
+        'post': post,
+    }
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
         comment.post = post
         comment.save()
         return redirect('posts:post_detail', post_id)
-    return render(request, template, context=context)
+    return render(request, 'posts/post_detail.html', context=context)
 
 
 @login_required
@@ -160,10 +171,3 @@ def server_error(request):
 
 def permission_denied(request, exception):
     return render(request, 'posts/403.html', status=403)
-
-
-@login_required
-def add_comment(request, post_id):
-    # заглушка для пайтеста, зачем плодить урлы, если можно
-    # всё на странице поста делать?
-    return redirect('posts:post_detail', post_id=post_id)

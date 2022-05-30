@@ -10,4 +10,13 @@ urlpatterns = [
     path('auth/', include('users.urls', namespace='users')),
     path('auth/', include('django.contrib.auth.urls')),
     path('about/', include('about.urls', namespace='about')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )
+
+handler404 = "posts.views.page_not_found"
+handler500 = "posts.views.server_error"
+handler403 = "posts.views.permission_denied"

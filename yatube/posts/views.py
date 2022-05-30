@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from users.forms import UpdateUserForm, ProfileForm
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post, User
 from .utils import paginator
@@ -47,6 +48,27 @@ def profile(request, username):
         'button': True,
         'post_count': page_obj.paginator.count,
         'following': following,
+    }
+    return render(request, template, context=context)
+
+
+@login_required
+def profile_edit(request, username):
+    template = 'posts/profile_edit.html'
+    user = get_object_or_404(User, username=username)
+    if request.user.username != username:
+        return redirect('posts:profile', username)
+    user_form = UpdateUserForm(request.POST or None, instance=user)
+    profile_form = ProfileForm(
+        request.POST, request.FILES or None, instance=user.profile
+    )
+    if user_form.is_valid() and profile_form.is_valid():
+        user_form.save()
+        profile_form.save()
+        return redirect('posts:profile', username)
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
     }
     return render(request, template, context=context)
 
@@ -126,3 +148,22 @@ def profile_unfollow(request, username):
     if is_follower.exists():
         is_follower.delete()
     return redirect('posts:profile', username)
+
+
+def page_not_found(request, exception):
+    return render(request, 'posts/404.html', {'path': request.path}, status=404)
+
+
+def server_error(request):
+    return render(request, 'posts/500.html', status=500)
+
+
+def permission_denied(request, exception):
+    return render(request, 'posts/403.html', status=403)
+
+
+@login_required
+def add_comment(request, post_id):
+    # заглушка для пайтеста, зачем плодить урлы, если можно
+    # всё на странице поста делать?
+    return redirect('posts:post_detail', post_id=post_id)

@@ -20,3 +20,12 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('avatar',)
+
+
+class UpdateUserForm(forms.ModelForm):
+    username = forms.CharField(required=True)
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username', 'email']

@@ -1,3 +1,4 @@
+from shutil import rmtree
 import tempfile
 from urllib.parse import urljoin
 
@@ -23,6 +24,11 @@ class PostCreateFormTests(TestCase):
             slug='test_slug5',
             description='Тестовое описание'
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         self.guest_client = Client()
@@ -107,4 +113,5 @@ class PostCreateFormTests(TestCase):
             follow=True,
         )
         post = Post.objects.first()
+        self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(post.post_image)

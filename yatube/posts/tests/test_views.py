@@ -1,6 +1,12 @@
+from http import HTTPStatus
+from shutil import rmtree
+import tempfile
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -20,11 +26,25 @@ class PostTests(TestCase):
             title='Заголовок для тестовой груп пы',
             slug='test_slug'
         )
-
+        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовая запись для создания поста',
-            group=cls.group
+            group=cls.group,
+            post_image=uploaded,
         )
 
     def setUp(self):
@@ -32,6 +52,11 @@ class PostTests(TestCase):
         self.user = PostTests.post.author
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+
+    @classmethod
+    def tearDownClass(cls):
+        rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -53,7 +78,7 @@ class PostTests(TestCase):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_index_pages_show_correct_context(self):
+    def test_pages_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         index_group_profile_pages = [
             reverse('posts:index'),
@@ -64,23 +89,21 @@ class PostTests(TestCase):
             with self.subTest(page=page):
                 response = self.authorized_client.get(page)
                 first_object = response.context["page_obj"][0]
-                post_text = first_object.text
-                post_author = first_object.author
                 post_group = first_object.group
-                self.assertEqual(post_text, self.post.text)
-                self.assertEqual(post_author, self.post.author)
+                self.assertEqual(first_object.text, self.post.text)
+                self.assertEqual(first_object.author, self.post.author)
                 self.assertEqual(post_group.title, self.post.group.title)
                 self.assertEqual(post_group.slug, self.post.group.slug)
+                self.assertEqual(first_object.post_image, self.post.post_image)
 
     def test_post_detail_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом"""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': '1'}))
         first_object = response.context["post"]
-        post_text = first_object.text
-        post_author = first_object.author
-        self.assertEqual(post_text, self.post.text)
-        self.assertEqual(post_author, self.post.author)
+        self.assertEqual(first_object.text, self.post.text)
+        self.assertEqual(first_object.author, self.post.author)
+        self.assertEqual(first_object.post_image, self.post.post_image)
 
     def test_post_form_show_correct_context(self):
         """Шаблон post_create/post_edit сформирован
@@ -201,10 +224,37 @@ class FollowTests(TestCase):
         self.assertEqual(post_text, self.post.text)
 
     def test_authorized_client_can_add_comment(self):
-        self.author_following.post(
+        response = self.author_following.post(
             f'/posts/{self.post.id}/', {
                 'text': "тестовый комментарий"
             }, follow=True
         )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         response = self.author_following.get(f'/posts/{self.post.id}/')
         self.assertContains(response, 'тестовый комментарий')
+
+
+class CacheTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='NoName')
+        cls.post = Post.objects.create(
+            author=cls.user,
+            text='Тестовая запись для создания поста')
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_cache_index(self):
+        first_step = self.authorized_client.get(reverse('posts:index'))
+        post_1 = Post.objects.get(pk=1)
+        post_1.text = 'Измененный текст'
+        post_1.save()
+        second_step = self.authorized_client.get(reverse('posts:index'))
+        self.assertEqual(first_step.content, second_step.content)
+        cache.clear()
+        third_step = self.authorized_client.get(reverse('posts:index'))
+        self.assertNotEqual(first_step.content, third_step.content)

@@ -23,9 +23,3 @@ class CommentForm(forms.ModelForm):
         fields = ['text']
         labels = {'text': 'Добавить комментарий'}
         help_texts = {'text': 'Текст комментария'}
-
-
-class FollowForm(forms.ModelForm):
-    class Meta:
-        model = Follow
-        fields = ['user']

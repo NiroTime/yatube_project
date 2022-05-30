@@ -37,12 +37,17 @@
           {% endif %}" href="{% url 'users:password_change' %}">Изменить пароль</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link link-light {% if request.resolver_match.view_name  == 'posts:profile_edit' %}
+          active
+          {% endif %}" href="{% url 'posts:profile_edit' request.user.username %}">Изменить профиль</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link link-light {% if request.resolver_match.view_name  == 'users:logout' %}
           active
           {% endif %}" href="{% url 'users:logout' %}">Выйти</a>
         </li>
         <li>
-          <a class="nav-link">Пользователь: {{ user.username }}</a>
+          <a class="nav-link" href="{% url 'posts:profile' request.user.username %}">{{ user.username }}</a>
         </li>
         {% else %}
         <li class="nav-item">

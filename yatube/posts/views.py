@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from users.forms import UpdateUserForm, ProfileForm
+from users.forms import ProfileForm, UpdateUserForm
+
 from .forms import CommentForm, PostForm
 from .models import Follow, Group, Post, User
 from .utils import paginator
@@ -162,7 +163,9 @@ def profile_unfollow(request, username):
 
 
 def page_not_found(request, exception):
-    return render(request, 'posts/404.html', {'path': request.path}, status=404)
+    return render(
+        request, 'posts/404.html', {'path': request.path}, status=404
+    )
 
 
 def server_error(request):

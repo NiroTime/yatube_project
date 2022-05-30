@@ -1,6 +1,6 @@
+import tempfile
 from http import HTTPStatus
 from shutil import rmtree
-import tempfile
 
 from django import forms
 from django.conf import settings
